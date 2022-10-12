@@ -5,8 +5,9 @@ function site(siteData) {
   return html;
 }
 
-function displayHTML(html, targetElement) {
-  targetElement.appendChild(html);
+function addHtmlToElement(html, elementSelector) {
+  const element = document.querySelector(elementSelector);
+  element.innerHTML = html;
 }
 
 async function getSiteData(url) {
@@ -18,8 +19,15 @@ async function getSiteData(url) {
 
 async function showSiteData(url) {
   const siteData = await getSiteData(url);
-  const body = document.querySelector("body");
-  displayHTML(site(siteData), body);
+  const html = `<h2>${siteData.name}</h2>
+    <ul>
+      ${siteData.productionLines.map(
+        (line) => `<li>${JSON.stringify(line)}</li>`
+      )}
+    </ul>
+  `;
+
+  addHtmlToElement(html, "body");
 }
 
 showSiteData("/site-info");

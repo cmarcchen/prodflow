@@ -1,5 +1,8 @@
 const _ = require("lodash");
+const { MongoClient } = require("mongodb");
 const express = require("express");
+const { connectMongoDb, getAllSites, insertSite } = require("./db_utils");
+
 const app = express();
 const port = 3000;
 
@@ -18,6 +21,8 @@ var siteData = {
   ],
 };
 
+connectMongoDb();
+
 app.use(express.static("public"));
 app.use(express.json());
 
@@ -29,8 +34,8 @@ app.get("/", (req, res) => {
   res.json(data);
 });
 
-app.get("/site-info", (req, res) => {
-  let data = siteData;
+app.get("/site-info", async (req, res) => {
+  let data = await getAllSites();
   res.json(data);
 });
 
@@ -38,13 +43,11 @@ app.post("/post-example", (req, res) => {
   res.send("data received");
 });
 
-app.post("/new-production-line", (req, res) => {
+app.post("/new-production-site", async (req, res) => {
   const newLine = req.body;
   console.log(newLine);
-  siteData.productionLines.push({
-    lineNumber: newLine.lineNumber,
-    unitsPerMinute: 0,
-  });
+  await insertSite(newLine);
+
   res.sendStatus(201);
 });
 
